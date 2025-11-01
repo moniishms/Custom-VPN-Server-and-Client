@@ -34,11 +34,11 @@ Download the latest LTS version from:
 https://ubuntu.com/download/desktop
 
 For beginners, follow this video tutorial to install Ubuntu:
-YouTube Setup Guide: [Insert your YouTube installation link here]
+YouTube Setup Guide: https://www.youtube.com/watch?v=nCZcTKFbD2Q
 
 Step 2: Set Up the Project
 # Clone this repository
-git clone https://github.com/<your-username>/<your-repo-name>.git
+git clone https://github.com/<moniishms>/<Custom-VPN-Server-and-Client>.git
 cd myvpn
 
 # Create a virtual environment

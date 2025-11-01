@@ -1,150 +1,126 @@
-# Custom VPN Server and Client
+# MyVPN Hotspot Project
 
 ## Description
-
-This project implements a Python-based VPN system that enables secure communication between multiple systems connected over a hotspot or local network.  
-It uses socket programming, AES encryption, and TUN/TAP interfaces to create an encrypted tunnel between a server and clients.  
-This project is ideal for understanding low-level networking, encryption, and VPN concepts.
-
----
+This project implements a Python-based VPN system that enables secure communication between multiple systems connected over a hotspot or local network. It uses socket programming, AES encryption, and TUN/TAP interfaces to create an encrypted tunnel between a server and clients. This project helps understand low-level networking, encryption, and VPN concepts.
 
 ## Language & Dependencies
+Language: Python 3  
+Libraries: socket, threading, fcntl, struct, os, time, pycryptodome  
+Dependency Manager: pip
 
-**Language:** Python 3  
+## Step 1: Install Ubuntu on VirtualBox
+Download the latest LTS version of Ubuntu from https://ubuntu.com/download/desktop and install it using VirtualBox.
 
-**Libraries:**
-- socket
-- threading
-- fcntl
-- struct
-- os
-- time
-- pycryptodome
+## Step 2: Configure VirtualBox Network Settings
+To enable proper communication between your host (server) and guest (client) machines, configure two network adapters.
 
-**Dependency Manager:** pip
+1. Shut down your Ubuntu VM if it’s running.
+2. Open VirtualBox → Select your VM → Settings → Network.
 
----
+**Adapter 1: NAT (for Internet Access)**
+- Enable Network Adapter: Checked  
+- Attached to: NAT  
+- Purpose: Provides internet access inside the VM.
 
-## Installation
+**Adapter 2: Bridged Adapter (for Local Hotspot Communication)**
+- Enable Network Adapter: Checked  
+- Attached to: Bridged Adapter  
+- Name: Select your Wi-Fi adapter (the one used for your hotspot or connection)  
+- Promiscuous Mode: Allow All  
+- Cable Connected: Checked  
 
-### Step 1: Download and Install Ubuntu
+Click OK to save.
 
-Install Ubuntu using Oracle VM VirtualBox or on a physical PC.  
-Download the latest LTS version from:  
-`https://ubuntu.com/download/desktop`
+3. Restart the VM and verify interfaces
+```
+ip addr
+```
+You should see two interfaces, for example:
+- enp0s3 – NAT (Internet)
+- enp0s8 – Bridged (Hotspot communication)
 
-For beginners, follow this video tutorial to install Ubuntu:  
-**YouTube Setup Guide:** `https://www.youtube.com/watch?v=nCZcTKFbD2Q`
+4. Test connectivity
+```
+ping -c 4 google.com
+ping 192.168.43.1
+```
+If both work, your network setup is correct.
 
----
-
-### Step 2: Set Up the Project
-
-```bash
-# Clone this repository
-git clone https://github.com/moniishms/Custom-VPN-Server-and-Client.git
-cd myvpn
-
-# Create a virtual environment
+## Step 3: Clone the Repository and Set Up the Project
+```
+sudo apt update
+sudo apt install git python3-venv -y
+git clone https://github.com/moniishmohan/Custom-VPN-Server-and-Client.git
+cd Custom-VPN-Server-and-Client
 python3 -m venv venv
 source venv/bin/activate
-
-# Install required dependencies
 pip install pycryptodome
 ```
 
----
+## Step 4: Server Setup (Hotspot Host)
+1. Enable your hotspot on the server PC (usually IP like `192.168.43.1`).
+2. Start the VPN server:
+```
+cd ~/Custom-VPN-Server-and-Client
+sudo ~/Custom-VPN-Server-and-Client/venv/bin/python3 server.py
+```
+Keep this terminal open. The server must remain active for clients to connect.
 
-## Step 3: Usage
+## Step 5: Client Setup (Hotspot Device)
+1. Ensure the client PC is connected to the same hotspot as the server.
+2. On the **server machine**, find its hotspot IP address:
+```
+ip addr
+```
+Look for the network interface connected to your hotspot (for example `wlp2s0` or `enp0s8`), and note the `inet` address.  
+Example:
+```
+inet 192.168.43.1/24
+```
+Here, your server IP is `192.168.43.1`.
 
-### Server Setup (Hotspot Host)
-
-1. Enable the hotspot on your PC.  
-   The default hotspot IP is typically `192.168.43.1`.
-
-2. Start the server:
-
-```bash
-cd ~/myvpn
-source venv/bin/activate
-sudo python3 server.py
+3. On the **client machine**, open the `client.py` file to edit it:
+```
+cd ~/Custom-VPN-Server-and-Client
+nano client.py
 ```
 
-3. Keep the server terminal running. The server must remain active for clients to connect.
+4. Inside the file, find the following line:
+```
+SERVER_IP = "192.168.43.1"
+```
+Replace `"192.168.43.1"` with the server’s actual IP address obtained in Step 2.
 
----
+5. Save and exit:
+- Press `Ctrl + O` → Enter → `Ctrl + X`.
 
-### Client Setup (Any PC Connected to Hotspot)
-
-1. Edit `client.py` and replace the server IP with your hotspot IP:
-
-```python
-SERVER_IP = "192.168.43.1"  # Replace with your server’s hotspot IP
+6. Start the client:
+```
+sudo ~/Custom-VPN-Server-and-Client/venv/bin/python3 client.py
 ```
 
-2. Run the client:
-
-```bash
-cd ~/myvpn
-source venv/bin/activate
-sudo python3 client.py
+## Step 6: Test the VPN Connection
+On the client:
 ```
-
----
-
-### Testing the VPN Connection
-
-From the client terminal, test the VPN tunnel by pinging the server:
-
-```bash
 ping 10.8.0.1
-```
-
-If successful, you can also ping other clients connected to the same VPN network:
-
-```bash
 ping 10.8.0.2
 ```
-
----
-
-## Project Structure
-
-| File | Description |
-|------|--------------|
-| `server.py` | Initializes and manages the VPN server. Handles encryption, decryption, and data forwarding through TUN interface. |
-| `client.py` | Connects to the VPN server via socket connection and establishes an encrypted tunnel using AES. |
-| `README.md` | Documentation for setup, installation, and usage. |
-| `venv/` | Virtual environment containing project dependencies. |
-
----
-
-## Features
-
-- AES-encrypted communication
-- Socket-based data tunneling
-- Works over hotspot or LAN
-- Lightweight Python-based VPN
-- Educational and easy to modify
-
----
+If packets are received, your encrypted tunnel is working.
 
 ## Troubleshooting
+- **Permission Denied**: Run scripts with `sudo`.  
+- **ModuleNotFoundError: No module named 'Crypto'**: Run `pip install pycryptodome` inside your virtual environment.  
+- **Network Issues**: Check if both systems are on the same hotspot and the correct IP is set.  
+- **TUN/TAP Errors**: Ensure you run with `sudo` and have TUN enabled in VirtualBox.  
 
-- **Permission Denied:** Run scripts using `sudo` to access `/dev/net/tun`.  
-- **Module Not Found:** Ensure dependencies are installed inside the virtual environment.  
-- **No Connection:** Make sure both server and client are on the same hotspot network.  
-- **Ping Fails:** Disable firewall or check your network adapter configuration.
+## Project Structure
+| File | Description |
+|------|--------------|
+| server.py | Handles encryption, tunneling, and packet forwarding. |
+| client.py | Connects to server and sets up VPN tunnel. |
+| README.md | Project documentation. |
+| venv/ | Virtual environment folder. |
 
----
-
-## Authors
-
-**Moniish Mohansrinivasan**
-
----
-
-## Optional
-
-Provide your Ubuntu installation YouTube link here:  
-`[Ubuntu Setup Video](https://www.youtube.com/watch?v=nCZcTKFbD2Q)`
+## Author
+Moniish Mohansrinivasan  
+Roll No: 24BCE5301

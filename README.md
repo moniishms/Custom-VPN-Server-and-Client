@@ -88,7 +88,8 @@ On the server machine, find its hotspot IP address:
 ip addr
 ```
 
-Look for the interface connected to the hotspot (for example wlp2s0 or enp0s8) and note its inet address:  
+Look for the interface connected to the hotspot or other external connection enp0s8:  
+If same ubuntu server then enp0s2
 Example output:
 ```
 inet 192.168.43.1/24

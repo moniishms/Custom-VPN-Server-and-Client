@@ -33,6 +33,7 @@ To enable proper communication between your host (server) and guest (client) mac
 - Enable Network Adapter: ✅ 
 - Attached to: Bridged Adapter  
 - Name: Select your Wi-Fi adapter (used for hotspot connection)  
+    type netsh wlan show interfaces in cmd to see they type of adapter
 - Promiscuous Mode: Allow All  
 - Cable Connected: ✅  
 

@@ -46,7 +46,7 @@ ip addr
 
 You should see two interfaces, for example:
 
-- enp0s3 – NAT (Internet)  
+- enp0s2 – NAT (Internet)  
 - enp0s8 – Bridged (Hotspot)
 
 ### Test Connectivity
